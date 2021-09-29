@@ -1,0 +1,17 @@
+body {
+    margin: 0;
+    background-color: rgb(23, 36, 23);
+    display: flex;
+}
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+.test {
+    background-color: #000;
+    cursor: pointer;
+    &:hover {
+        background-color: #CCC;
+    }
+}
