@@ -7,10 +7,10 @@ let isStarted = false;
 diamond.addEventListener('click', () => {
     start.style.display = 'none';
     count.style.display = 'block';
+    isStarted = true;
     let time = 1;
     count.textContent = time;
     let timer = setInterval(() => {
-        isStarted = true;
         time++;
         count.textContent = time;
         if (time >= 4) {
@@ -22,11 +22,8 @@ diamond.addEventListener('click', () => {
     }, 1000);
 });
 diamond.addEventListener('mouseenter', () => {
-    console.log('mouse is here');
-    if (isStarted) body.style.background = 'rgb(191, 116, 241)'; 
-       
+    if (isStarted) body.style.background = 'rgb(191, 116, 241)';   
 });
 diamond.addEventListener('mouseleave', () => {
-    console.log('mouse is not here');
     body.style.background = 'white';
 });
