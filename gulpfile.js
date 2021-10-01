@@ -1,4 +1,4 @@
-const { src, dest, watch, parallel } = require('gulp');
+const { src, dest, watch, parallel, series } = require('gulp');
 const pug = require('gulp-pug');
 const sass = require('gulp-sass')(require('sass'));
 const concat = require('gulp-concat')
@@ -6,6 +6,8 @@ const browserSync = require("browser-sync").create();
 const uglify = require('gulp-uglify-es').default;
 const autoprefixer = require('gulp-autoprefixer');
 const imagemin = require('gulp-imagemin');
+const del = require('del');
+const babel = require('gulp-babel');
 // 
 function browsersync() {
     browserSync.init({
@@ -13,6 +15,11 @@ function browsersync() {
         server: "./src"
     });
 }
+
+function cleanDist() {
+    return del('dist')
+}
+
 function images() {
     return src('src/img/**/*')
         .pipe(imagemin([
@@ -28,15 +35,18 @@ function images() {
         ]))
         .pipe(dest('dist/img'))
 }
+
 function scripts() {
     return src([
+        'src/js/app.js',
         'src/js/main.js',
     ])
     .pipe(concat('main.min.js'))
     .pipe(uglify())
-    .pipe(dest('src/js'))
+    .pipe(dest('src/minjs'))
     .pipe(browserSync.stream())
 }
+
 function styles() {
     return src('src/scss/style.scss')
         .pipe(sass({outputStyle: 'compressed'}))
@@ -53,7 +63,7 @@ function build() {
     return src([
         'src/css/style.min.css',
         'src.fonts/**/*',
-        'src/js/main.min.js',
+        'src/minjs/main.min.js',
         'src/*.html',
 
     ], {base: 'src'})
@@ -63,37 +73,28 @@ function build() {
 function watching() {
     watch(['src/scss/**/*.scss'], styles)
     watch(['src/js/**/*.js', '!src/js/main.min.js'], scripts)
+    watch(['src/*.pug'], pugToHTML)
     watch(['src/*.html']).on('change', browserSync.reload)
 }
+
+function pugToHTML() {
+    return src('src/*.pug')
+      .pipe(
+        pug({
+            pretty: true
+        })
+      )
+      .pipe(dest('src'));
+}
+
 
 exports.styles = styles;
 exports.watching = watching;
 exports.browsersync = browsersync;
 exports.scripts = scripts;
-exports.build = build;
 exports.images = images;
+exports.cleanDist = cleanDist;
+exports.pugToHTML = pugToHTML;
 
+exports.build = series(cleanDist, images, build);
 exports.default = parallel(scripts, browsersync, watching);
-// 
-// gulp.task('pug', function(){
-//     return gulp.src('src/*.pug')
-//         .pipe(pug())
-//         .pipe(gulp.dest('src'))
-// });
-// gulp.task('scss', function(){
-//     return gulp.src('src/scss/**/*.scss')
-//         .pipe(sass({outputStyle: 'compressed'}))
-//         .pipe(gulp.dest('src/css'))
-//         .pipe(browserSync.reload({stream: true}))
-// });
-// gulp.task('browser-sync', function() {
-//     browserSync.init({
-//         watch: true,
-//         server: "./src"
-//     });
-// });
-// gulp.task('watch', function(){
-//     gulp.watch('src/*.pug', gulp.parallel('pug'));
-//     gulp.watch('src/scss/**/*.scss', gulp.parallel('scss'));
-// });
-// gulp.task('default', gulp.parallel('browser-sync', 'watch'));
