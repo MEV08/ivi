@@ -3,9 +3,11 @@ const diamond = document.querySelector('#diamond');
 const start = document.querySelector('#start');
 const count = document.querySelector('#count');
 let isStarted = false;
+let activated = false;
 
 
 diamond.addEventListener('click', function() {
+    activated = true;
     if (!isStarted) {
         start.style.display = 'none';
         count.style.display = 'block';
@@ -26,7 +28,7 @@ diamond.addEventListener('click', function() {
     } 
 });
 diamond.addEventListener('mouseenter', function() {
-    if (isStarted) body.style.background = 'rgb(191, 116, 241)';   
+    if (activated) body.style.background = 'rgb(191, 116, 241)';   
 });
 diamond.addEventListener('mouseleave', function() {
     body.style.background = 'white';
